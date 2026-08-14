@@ -67,5 +67,19 @@ public class Main {
 
         System.out.println("Updated Status: "
                 + subscription.getStatus());
+
+        Order order = new Order(
+                "O001",
+                "C001",
+                "MP001",
+                LocalDate.now(),
+                OrderStatus.PLACED
+        );
+
+        System.out.println(order);
+
+        order.setStatus(OrderStatus.OUT_FOR_DELIVERY);
+
+        System.out.println("Updated Status: " + order.getStatus());
     }
 }
