@@ -1,9 +1,9 @@
 package com.tiffyn;
 
-import com.tiffyn.model.Customer;
-import com.tiffyn.model.MealPlan;
-import com.tiffyn.model.Vendor;
+import com.tiffyn.model.*;
 import jdk.swing.interop.SwingInterOpUtils;
+
+import java.time.LocalDate;
 
 public class Main {
 
@@ -35,6 +35,15 @@ public class Main {
                 "V001"
         );
 
+        Subscription subscription = new Subscription(
+                "S001",
+                "C001",
+                "MP001",
+                LocalDate.of(2026, 9, 1),
+                LocalDate.of(2026, 9, 30),
+                SubscriptionStatus.ACTIVE
+        );
+
         System.out.println(customer);
         System.out.println(vendor);
 
@@ -52,5 +61,11 @@ public class Main {
 
         System.out.println("Updated Price: ₹" + mealPlan.getPrice());
 
+        System.out.println(subscription);
+
+        subscription.setStatus(SubscriptionStatus.CANCELLED);
+
+        System.out.println("Updated Status: "
+                + subscription.getStatus());
     }
 }
