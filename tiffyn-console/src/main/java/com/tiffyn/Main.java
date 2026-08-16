@@ -1,8 +1,8 @@
 package com.tiffyn;
 
-import com.tiffyn.model.Subscription;
-import com.tiffyn.model.SubscriptionStatus;
-import com.tiffyn.service.SubscriptionService;
+import com.tiffyn.model.Order;
+import com.tiffyn.model.OrderStatus;
+import com.tiffyn.service.OrderService;
 
 import java.time.LocalDate;
 
@@ -10,63 +10,82 @@ public class Main {
 
     public static void main(String[] args) {
 
-        SubscriptionService subscriptionService =
-                new SubscriptionService();
+        OrderService orderService = new OrderService();
 
-        Subscription subscription1 = new Subscription(
-                "S001",
+        Order order1 = new Order(
+                "O001",
                 "C001",
                 "MP001",
-                LocalDate.of(2026, 9, 1),
-                LocalDate.of(2026, 9, 30),
-                SubscriptionStatus.ACTIVE
+                LocalDate.now(),
+                OrderStatus.PLACED
         );
 
-        Subscription subscription2 = new Subscription(
-                "S002",
+        Order order2 = new Order(
+                "O002",
                 "C001",
                 "MP002",
-                LocalDate.of(2026, 9, 1),
-                LocalDate.of(2026, 9, 30),
-                SubscriptionStatus.ACTIVE
+                LocalDate.now(),
+                OrderStatus.PREPARING
         );
 
-        // Add first subscription
-        subscriptionService.addSubscription(subscription1);
+        Order order3 = new Order(
+                "O003",
+                "C002",
+                "MP001",
+                LocalDate.now(),
+                OrderStatus.DELIVERED
+        );
 
-        System.out.println("All Subscriptions:");
-        subscriptionService.getAllSubscriptions()
+        // Add orders
+        orderService.addOrder(order1);
+        orderService.addOrder(order2);
+        orderService.addOrder(order3);
+
+        // Get all orders
+        System.out.println("All Orders:");
+
+        orderService.getAllOrders()
                 .forEach(System.out::println);
 
-        // Try second active subscription
-        System.out.println("\nTrying second subscription:");
+        // Find order
+        System.out.println("\nSearching for O001:");
 
-        subscriptionService.addSubscription(subscription2);
+        System.out.println(
+                orderService.findOrderById("O001")
+        );
 
-        // Check customer subscriptions
-        System.out.println("\nSubscriptions of C001:");
+        // Get orders by customer
+        System.out.println("\nOrders of C001:");
 
-        subscriptionService
-                .getSubscriptionsByCustomerId("C001")
+        orderService.getOrdersByCustomerId("C001")
                 .forEach(System.out::println);
 
-        // Cancel first subscription
-        System.out.println("\nCancelling S001...");
+        // Get orders by meal plan
+        System.out.println("\nOrders for MP001:");
 
-        subscriptionService.cancelSubscription("S001");
+        orderService.getOrdersByMealPlanId("MP001")
+                .forEach(System.out::println);
 
-        System.out.println(
-                subscriptionService.findSubscriptionById("S001")
+        // Update status
+        System.out.println("\nUpdating O001 status...");
+
+        orderService.updateOrderStatus(
+                "O001",
+                OrderStatus.OUT_FOR_DELIVERY
         );
 
-        // Now try adding S002 again
         System.out.println(
-                "\nTrying S002 again after cancellation:"
+                orderService.findOrderById("O001")
         );
 
-        subscriptionService.addSubscription(subscription2);
+        // Remove order
+        System.out.println("\nRemoving O003...");
 
-        subscriptionService.getAllSubscriptions()
+        orderService.removeOrder("O003");
+
+        System.out.println("\nRemaining Orders:");
+
+        orderService.getAllOrders()
                 .forEach(System.out::println);
     }
 }
