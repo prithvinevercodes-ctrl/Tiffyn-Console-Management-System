@@ -1,82 +1,72 @@
 package com.tiffyn;
 
-import com.tiffyn.model.MealPlan;
-import com.tiffyn.service.MealPlanService;
+import com.tiffyn.model.Subscription;
+import com.tiffyn.model.SubscriptionStatus;
+import com.tiffyn.service.SubscriptionService;
+
+import java.time.LocalDate;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        MealPlanService mealPlanService = new MealPlanService();
+        SubscriptionService subscriptionService =
+                new SubscriptionService();
 
-        MealPlan mealPlan1 = new MealPlan(
+        Subscription subscription1 = new Subscription(
+                "S001",
+                "C001",
                 "MP001",
-                "Monthly Veg Plan",
-                "Lunch + Dinner",
-                3000.00,
-                30,
-                "V001"
+                LocalDate.of(2026, 9, 1),
+                LocalDate.of(2026, 9, 30),
+                SubscriptionStatus.ACTIVE
         );
 
-        MealPlan mealPlan2 = new MealPlan(
+        Subscription subscription2 = new Subscription(
+                "S002",
+                "C001",
                 "MP002",
-                "Monthly Premium Plan",
-                "Lunch + Dinner + Snacks",
-                4500.00,
-                30,
-                "V001"
+                LocalDate.of(2026, 9, 1),
+                LocalDate.of(2026, 9, 30),
+                SubscriptionStatus.ACTIVE
         );
 
-        MealPlan mealPlan3 = new MealPlan(
-                "MP003",
-                "Student Plan",
-                "Lunch",
-                1800.00,
-                30,
-                "V002"
-        );
+        // Add first subscription
+        subscriptionService.addSubscription(subscription1);
 
-        // Add meal plans
-        mealPlanService.addMealPlan(mealPlan1);
-        mealPlanService.addMealPlan(mealPlan2);
-        mealPlanService.addMealPlan(mealPlan3);
-
-        // Get all meal plans
-        System.out.println("All Meal Plans:");
-
-        mealPlanService.getAllMealPlans()
+        System.out.println("All Subscriptions:");
+        subscriptionService.getAllSubscriptions()
                 .forEach(System.out::println);
 
-        // Find meal plan
-        System.out.println("\nSearching for MP001:");
+        // Try second active subscription
+        System.out.println("\nTrying second subscription:");
 
-        System.out.println(
-                mealPlanService.findMealPlanById("MP001")
-        );
+        subscriptionService.addSubscription(subscription2);
 
-        // Get meal plans by vendor
-        System.out.println("\nMeal Plans offered by V001:");
+        // Check customer subscriptions
+        System.out.println("\nSubscriptions of C001:");
 
-        mealPlanService.getMealPlansByVendorId("V001")
+        subscriptionService
+                .getSubscriptionsByCustomerId("C001")
                 .forEach(System.out::println);
 
-        // Update meal plan
-        mealPlan1.setPrice(3200.00);
+        // Cancel first subscription
+        System.out.println("\nCancelling S001...");
 
-        mealPlanService.updateMealPlan(mealPlan1);
-
-        System.out.println("\nAfter Update:");
+        subscriptionService.cancelSubscription("S001");
 
         System.out.println(
-                mealPlanService.findMealPlanById("MP001")
+                subscriptionService.findSubscriptionById("S001")
         );
 
-        // Remove meal plan
-        mealPlanService.removeMealPlan("MP003");
+        // Now try adding S002 again
+        System.out.println(
+                "\nTrying S002 again after cancellation:"
+        );
 
-        System.out.println("\nAfter Removing MP003:");
+        subscriptionService.addSubscription(subscription2);
 
-        mealPlanService.getAllMealPlans()
+        subscriptionService.getAllSubscriptions()
                 .forEach(System.out::println);
     }
 }
