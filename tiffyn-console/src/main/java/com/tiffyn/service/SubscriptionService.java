@@ -1,9 +1,10 @@
-
 package com.tiffyn.service;
 
+import com.tiffyn.exception.SubscriptionException;
 import com.tiffyn.model.Subscription;
 import com.tiffyn.model.SubscriptionStatus;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +18,73 @@ public class SubscriptionService {
 
     public void addSubscription(Subscription subscription) {
 
-        if (hasActiveSubscription(subscription.getCustomerId())) {
-            System.out.println(
-                    "Customer already has an active subscription."
+        validateSubscription(subscription);
+
+        if (findSubscriptionById(subscription.getSubscriptionId()) != null) {
+            throw new SubscriptionException(
+                    "Subscription with ID "
+                            + subscription.getSubscriptionId()
+                            + " already exists."
             );
-            return;
+        }
+
+        if (hasActiveSubscription(subscription.getCustomerId())) {
+            throw new SubscriptionException(
+                    "Customer "
+                            + subscription.getCustomerId()
+                            + " already has an active subscription."
+            );
         }
 
         subscriptions.add(subscription);
+    }
+
+    private void validateSubscription(Subscription subscription) {
+
+        if (subscription == null) {
+            throw new SubscriptionException(
+                    "Subscription cannot be null."
+            );
+        }
+
+        if (subscription.getCustomerId() == null
+                || subscription.getCustomerId().isBlank()) {
+
+            throw new SubscriptionException(
+                    "Customer ID cannot be empty."
+            );
+        }
+
+        if (subscription.getMealPlanId() == null
+                || subscription.getMealPlanId().isBlank()) {
+
+            throw new SubscriptionException(
+                    "Meal Plan ID cannot be empty."
+            );
+        }
+
+        if (subscription.getStartDate() == null
+                || subscription.getEndDate() == null) {
+
+            throw new SubscriptionException(
+                    "Subscription dates cannot be null."
+            );
+        }
+
+        if (subscription.getEndDate()
+                .isBefore(subscription.getStartDate())) {
+
+            throw new SubscriptionException(
+                    "End date cannot be before start date."
+            );
+        }
+
+        if (subscription.getStatus() == null) {
+
+            throw new SubscriptionException(
+                    "Subscription status cannot be null."
+            );
+        }
     }
 
     public Subscription findSubscriptionById(String subscriptionId) {
@@ -39,6 +99,22 @@ public class SubscriptionService {
         }
 
         return null;
+    }
+
+    public Subscription getSubscriptionById(String subscriptionId) {
+
+        Subscription subscription =
+                findSubscriptionById(subscriptionId);
+
+        if (subscription == null) {
+            throw new SubscriptionException(
+                    "Subscription with ID "
+                            + subscriptionId
+                            + " not found."
+            );
+        }
+
+        return subscription;
     }
 
     public List<Subscription> getAllSubscriptions() {
@@ -100,15 +176,20 @@ public class SubscriptionService {
     public void cancelSubscription(String subscriptionId) {
 
         Subscription subscription =
-                findSubscriptionById(subscriptionId);
+                getSubscriptionById(subscriptionId);
 
-        if (subscription != null
-                && subscription.getStatus()
-                == SubscriptionStatus.ACTIVE) {
+        if (subscription.getStatus()
+                != SubscriptionStatus.ACTIVE) {
 
-            subscription.setStatus(
-                    SubscriptionStatus.CANCELLED
+            throw new SubscriptionException(
+                    "Subscription "
+                            + subscriptionId
+                            + " is not active."
             );
         }
+
+        subscription.setStatus(
+                SubscriptionStatus.CANCELLED
+        );
     }
 }

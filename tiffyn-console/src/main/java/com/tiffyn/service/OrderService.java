@@ -1,8 +1,10 @@
 package com.tiffyn.service;
 
+import com.tiffyn.exception.OrderException;
 import com.tiffyn.model.Order;
 import com.tiffyn.model.OrderStatus;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,63 @@ public class OrderService {
     }
 
     public void addOrder(Order order) {
+
+        validateOrder(order);
+
+        if (findOrderById(order.getOrderId()) != null) {
+            throw new OrderException(
+                    "Order with ID "
+                            + order.getOrderId()
+                            + " already exists."
+            );
+        }
+
         orders.add(order);
+    }
+
+    private void validateOrder(Order order) {
+
+        if (order == null) {
+            throw new OrderException(
+                    "Order cannot be null."
+            );
+        }
+
+        if (order.getCustomerId() == null
+                || order.getCustomerId().isBlank()) {
+
+            throw new OrderException(
+                    "Customer ID cannot be empty."
+            );
+        }
+
+        if (order.getMealPlanId() == null
+                || order.getMealPlanId().isBlank()) {
+
+            throw new OrderException(
+                    "Meal Plan ID cannot be empty."
+            );
+        }
+
+        if (order.getOrderDate() == null) {
+            throw new OrderException(
+                    "Order date cannot be null."
+            );
+        }
+
+        if (order.getOrderDate()
+                .isAfter(LocalDate.now())) {
+
+            throw new OrderException(
+                    "Order date cannot be in the future."
+            );
+        }
+
+        if (order.getStatus() == null) {
+            throw new OrderException(
+                    "Order status cannot be null."
+            );
+        }
     }
 
     public Order findOrderById(String orderId) {
@@ -28,6 +86,21 @@ public class OrderService {
         }
 
         return null;
+    }
+
+    public Order getOrderById(String orderId) {
+
+        Order order = findOrderById(orderId);
+
+        if (order == null) {
+            throw new OrderException(
+                    "Order with ID "
+                            + orderId
+                            + " not found."
+            );
+        }
+
+        return order;
     }
 
     public List<Order> getAllOrders() {
@@ -66,17 +139,21 @@ public class OrderService {
             String orderId,
             OrderStatus newStatus) {
 
-        Order existingOrder = findOrderById(orderId);
-
-        if (existingOrder != null) {
-            existingOrder.setStatus(newStatus);
+        if (newStatus == null) {
+            throw new OrderException(
+                    "Order status cannot be null."
+            );
         }
+
+        Order existingOrder = getOrderById(orderId);
+
+        existingOrder.setStatus(newStatus);
     }
 
     public void removeOrder(String orderId) {
 
-        orders.removeIf(
-                order -> order.getOrderId().equals(orderId)
-        );
+        Order order = getOrderById(orderId);
+
+        orders.remove(order);
     }
 }
