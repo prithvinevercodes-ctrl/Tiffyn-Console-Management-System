@@ -1,85 +1,59 @@
 package com.tiffyn;
 
-import com.tiffyn.model.*;
-import jdk.swing.interop.SwingInterOpUtils;
-
-import java.time.LocalDate;
+import com.tiffyn.model.Customer;
+import com.tiffyn.service.CustomerService;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        Customer customer = new Customer(
+        CustomerService customerService = new CustomerService();
+
+        Customer customer1 = new Customer(
                 "C001",
-                "Somya",
-                "8810554256",
-                "Somya@example.com",
+                "Rahul",
+                "9876543210",
+                "rahul@example.com",
                 "Greater Noida"
         );
 
-        Vendor vendor = new Vendor(
-                "V001",
-                "Prathvi",
-                "997989142",
-                "prathvi@example.com",
-                "Maa's Kitchen",
-                "Greater Noida"
+        Customer customer2 = new Customer(
+                "C002",
+                "Aman",
+                "9876543211",
+                "aman@example.com",
+                "Delhi"
         );
 
-        MealPlan mealPlan = new MealPlan(
-                "MP001",
-                "Monthly Veg Plan",
-                "Lunch + Dinner",
-                3000.00,
-                30,
-                "V001"
+        // Add customers
+        customerService.addCustomer(customer1);
+        customerService.addCustomer(customer2);
+
+        // Get all customers
+        System.out.println("All Customers:");
+        customerService.getAllCustomers()
+                .forEach(System.out::println);
+
+        // Find customer
+        System.out.println("\nSearching for C001:");
+        System.out.println(
+                customerService.findCustomerById("C001")
         );
 
-        Subscription subscription = new Subscription(
-                "S001",
-                "C001",
-                "MP001",
-                LocalDate.of(2026, 9, 1),
-                LocalDate.of(2026, 9, 30),
-                SubscriptionStatus.ACTIVE
+        // Update customer
+        customer1.setName("Rahul Sharma");
+        customerService.updateCustomer(customer1);
+
+        System.out.println("\nAfter Update:");
+        System.out.println(
+                customerService.findCustomerById("C001")
         );
 
-        System.out.println(customer);
-        System.out.println(vendor);
+        // Remove customer
+        customerService.removeCustomer("C002");
 
-        customer.setName("Somya Rajput");
-        vendor.setBusinessName("Maa's kitchen");
-
-        System.out.println();
-
-        System.out.println("Updated Customer: "+ customer.getName());
-        System.out.println("Updated Vendor: "+ vendor.getBusinessName());
-
-        System.out.println(mealPlan);
-
-        mealPlan.setPrice(3200.00);
-
-        System.out.println("Updated Price: ₹" + mealPlan.getPrice());
-
-        System.out.println(subscription);
-
-        subscription.setStatus(SubscriptionStatus.CANCELLED);
-
-        System.out.println("Updated Status: "
-                + subscription.getStatus());
-
-        Order order = new Order(
-                "O001",
-                "C001",
-                "MP001",
-                LocalDate.now(),
-                OrderStatus.PLACED
-        );
-
-        System.out.println(order);
-
-        order.setStatus(OrderStatus.OUT_FOR_DELIVERY);
-
-        System.out.println("Updated Status: " + order.getStatus());
+        System.out.println("\nAfter Removing C002:");
+        customerService.getAllCustomers()
+                .forEach(System.out::println);
     }
 }
