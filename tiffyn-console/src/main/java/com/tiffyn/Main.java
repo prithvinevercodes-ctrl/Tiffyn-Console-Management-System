@@ -1,60 +1,82 @@
 package com.tiffyn;
 
-import com.tiffyn.model.Vendor;
-import com.tiffyn.service.VendorService;
+import com.tiffyn.model.MealPlan;
+import com.tiffyn.service.MealPlanService;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        VendorService vendorService = new VendorService();
+        MealPlanService mealPlanService = new MealPlanService();
 
-        Vendor vendor1 = new Vendor(
-                "V001",
-                "Neha",
-                "9876543211",
-                "neha@example.com",
-                "Maa's Kitchen",
-                "Greater Noida"
+        MealPlan mealPlan1 = new MealPlan(
+                "MP001",
+                "Monthly Veg Plan",
+                "Lunch + Dinner",
+                3000.00,
+                30,
+                "V001"
         );
 
-        Vendor vendor2 = new Vendor(
-                "V002",
-                "Amit",
-                "9876543212",
-                "amit@example.com",
-                "Ghar Ka Tiffin",
-                "Delhi"
+        MealPlan mealPlan2 = new MealPlan(
+                "MP002",
+                "Monthly Premium Plan",
+                "Lunch + Dinner + Snacks",
+                4500.00,
+                30,
+                "V001"
         );
 
-        // Add vendors
-        vendorService.addVendor(vendor1);
-        vendorService.addVendor(vendor2);
+        MealPlan mealPlan3 = new MealPlan(
+                "MP003",
+                "Student Plan",
+                "Lunch",
+                1800.00,
+                30,
+                "V002"
+        );
 
-        System.out.println("All Vendors:");
-        vendorService.getAllVendors()
+        // Add meal plans
+        mealPlanService.addMealPlan(mealPlan1);
+        mealPlanService.addMealPlan(mealPlan2);
+        mealPlanService.addMealPlan(mealPlan3);
+
+        // Get all meal plans
+        System.out.println("All Meal Plans:");
+
+        mealPlanService.getAllMealPlans()
                 .forEach(System.out::println);
 
-        // Find vendor
-        System.out.println("\nSearching for V001:");
+        // Find meal plan
+        System.out.println("\nSearching for MP001:");
+
         System.out.println(
-                vendorService.findVendorById("V001")
+                mealPlanService.findMealPlanById("MP001")
         );
 
-        // Update vendor
-        vendor1.setBusinessName("Neha's Premium Kitchen");
-        vendorService.updateVendor(vendor1);
+        // Get meal plans by vendor
+        System.out.println("\nMeal Plans offered by V001:");
+
+        mealPlanService.getMealPlansByVendorId("V001")
+                .forEach(System.out::println);
+
+        // Update meal plan
+        mealPlan1.setPrice(3200.00);
+
+        mealPlanService.updateMealPlan(mealPlan1);
 
         System.out.println("\nAfter Update:");
+
         System.out.println(
-                vendorService.findVendorById("V001")
+                mealPlanService.findMealPlanById("MP001")
         );
 
-        // Remove vendor
-        vendorService.removeVendor("V002");
+        // Remove meal plan
+        mealPlanService.removeMealPlan("MP003");
 
-        System.out.println("\nAfter Removing V002:");
-        vendorService.getAllVendors()
+        System.out.println("\nAfter Removing MP003:");
+
+        mealPlanService.getAllMealPlans()
                 .forEach(System.out::println);
     }
 }
